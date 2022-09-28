@@ -1,1 +1,1 @@
-# mailtest
+https://oktobat.github.io/mailtest/
