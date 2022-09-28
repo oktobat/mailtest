@@ -1,0 +1,257 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Swatch</title>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
+	<link rel="stylesheet" href="./css/reset.css">
+	<link rel="stylesheet" href="./css/index.css">
+	<script src="./js/jquery-1.12.4.min.js"></script>
+	<script src="./js/prefixfree.min.js"></script>
+	<script src="./js/jquery.mousewheel.min.js"></script>
+</head>
+<body>
+	
+<!-- 로고 -->
+<h1><img src="./img/logo.png" /></h1>
+
+<div class="open">
+	<span class="bar bar1"></span>
+	<span class="bar bar2"></span>
+	<span class="bar bar3"></span>
+	<span class="blind">메뉴열기</span>
+</div>
+
+<div class="openlist">
+	<ul>
+		<li><a href="#sect1">About</a></li>
+		<li><a href="#sect2">Skill</a></li>
+		<li><a href="#sect3">Gallery</a></li>
+		<li><a href="#sect4">Contact</a></li>
+	</ul>
+</div>
+
+<!-- 주 메뉴 -->
+<ul id="menu">
+	<li class="on"><a href="#"><span>About</span></a></li>
+	<li><a href="#"><span>Skill</span></a></li>
+	<li><a href="#"><span>Gallery</span></a></li>
+	<li><a href="#"><span>Contact</span></a></li>
+</ul>
+
+<!-- sns -->
+<ul id="sns">
+	<li><a href="#"><i class="fab fa-facebook"></i></a></li>
+	<li><a href="#"><i class="fab fa-twitter"></i></a></li>
+	<li><a href="#"><i class="fas fa-envelope"></i></a></li>
+</ul>
+
+<div class="walkBox">
+	<div class="humanBg"></div>
+</div>
+
+
+<!-- 전체 페이지 -->
+<div id="wrap">
+
+	<!-- 첫 번째 박스 -->
+	<section id="sect1">
+		<article>
+			첫번째 섹션
+		</article>
+	</section>
+	
+	<!-- 두 번째 박스 -->
+	<section id="sect2">
+		<article>
+			두번째 섹션
+		</article>
+	</section>
+	
+	<!-- 세 번째 박스 -->
+	<section id="sect3">
+		<article>
+			세번째 섹션
+		</article>
+	</section>
+	
+	<!-- 네 번째 박스 -->
+	<section id="sect4">
+		<article>
+			<form class="gform" action="https://script.google.com/macros/s/AKfycbwWLMbHByaDsJ_zdGBfAZ2dolM5e_brI9nbJOlQ1w/exec" method="post">
+				<table>
+					<colgroup>
+						<col>
+						<col>
+					</colgroup>
+					<tr>
+						<td>
+							<label for="irum">이름</label>
+						</td>
+						<td>
+							<input type="text" name="name" id="irum">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<label for="email">이메일</label>
+						</td>
+						<td>
+							<input type="email" name="email" id="email">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<label for="hp">핸드폰번호</label>
+						</td>
+						<td>
+							<input type="tel" name="hp" id="hp" placeholder="-포함해서 입력하세요.(예 : 010-8156-2407)">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<label for="message">메세지</label>
+						</td>
+						<td>
+							<textarea name="message" id="message"></textarea>
+						</td>
+					</tr>
+				</table>
+				<div class="btn">
+					<button type="submit">보내기</button>
+					<button type="reset">취소</button>
+				</div>
+				<div style="display:none" class="thankyou_message">
+					<p>연락주셔서 감사합니다. 빠른 시일 내에 답변 드리겠습니다🚀</p>
+				</div>
+			</form>
+		</article>
+	</section>
+</div>
+
+<script src="./js/index.js"></script>
+<script>
+	(function() {
+  // get all data in form and return object
+  function getFormData(form) {
+    var elements = form.elements;
+    var honeypot;
+
+    var fields = Object.keys(elements).filter(function(k) {
+      if (elements[k].name === "honeypot") {
+        honeypot = elements[k].value;
+        return false;
+      }
+      return true;
+    }).map(function(k) {
+      if(elements[k].name !== undefined) {
+        return elements[k].name;
+      // special case for Edge's html collection
+      }else if(elements[k].length > 0){
+        return elements[k].item(0).name;
+      }
+    }).filter(function(item, pos, self) {
+      return self.indexOf(item) == pos && item;
+    });
+
+    var formData = {};
+    fields.forEach(function(name){
+      var element = elements[name];
+      
+      // singular form elements just have one value
+      formData[name] = element.value;
+
+      // when our element has multiple items, get their values
+      if (element.length) {
+        var data = [];
+        for (var i = 0; i < element.length; i++) {
+          var item = element.item(i);
+          if (item.checked || item.selected) {
+            data.push(item.value);
+          }
+        }
+        formData[name] = data.join(', ');
+      }
+    });
+
+    // add form-specific values into the data
+    formData.formDataNameOrder = JSON.stringify(fields);
+    formData.formGoogleSheetName = form.dataset.sheet || "responses"; // default sheet name
+    formData.formGoogleSendEmail
+      = form.dataset.email || ""; // no email by default
+
+    return {data: formData, honeypot: honeypot};
+  }
+
+  function handleFormSubmit(event) {  // handles form submit without any jquery
+    event.preventDefault();           // we are submitting via xhr below
+    var form = event.target;
+    var formData = getFormData(form);
+    var data = formData.data;
+
+    // If a honeypot field is filled, assume it was done so by a spam bot.
+    if (formData.honeypot) {
+      return false;
+    }
+
+    disableAllButtons(form);
+    var url = form.action;
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', url);
+    // xhr.withCredentials = true;
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          form.reset();
+          var formElements = form.querySelector(".form-elements")
+          if (formElements) {
+            formElements.style.display = "none"; // hide form
+          }
+          var thankYouMessage = form.querySelector(".thankyou_message");
+          if (thankYouMessage) {
+            thankYouMessage.style.display = "block";
+          }
+        }
+    };
+    // url encode form data for sending as post data
+    var encoded = Object.keys(data).map(function(k) {
+        return encodeURIComponent(k) + "=" + encodeURIComponent(data[k]);
+    }).join('&');
+    xhr.send(encoded);
+  }
+  
+  function loaded() {
+    // bind to the submit event of our form
+    var forms = document.querySelectorAll("form.gform");
+    for (var i = 0; i < forms.length; i++) {
+      forms[i].addEventListener("submit", handleFormSubmit, false);
+    }
+  };
+  document.addEventListener("DOMContentLoaded", loaded, false);
+
+  function disableAllButtons(form) {
+    var buttons = form.querySelectorAll("button");
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].disabled = true;
+    }
+  }
+})();
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
